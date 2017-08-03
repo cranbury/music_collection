@@ -26,7 +26,7 @@ RSpec.describe Session do
     end
   end
 
-  context 'playing songs changes state' do
+  context 'playing albums changes state' do
     it 'should store an unplayed song as unplayed' do
       allow(stdout).to receive(:gets).and_return('add "Ride the Lightning" "Metallica"','quit')
       
@@ -42,6 +42,36 @@ RSpec.describe Session do
       album = session.albums.values.first
       expect(album.unplayed?).to eq(false)
     end
+  end
 
+  context 'albums and artists are unique' do
+    it 'should store two albums when two are entered' do
+      allow(stdout).to receive(:gets)
+        .and_return('add "Ride the Lightning" "Metallica"','play "Ride the Lightning"',
+                    'add "Licensed to Ill" "Beastie Boys"', 'quit')
+      
+      session = Session.new(stdout)
+      expect(session.albums.length).to eq(2)
+      expect(session.artists.length).to eq(2)
+    end
+
+    it 'should only store one artist for two albums with the same artist' do
+      allow(stdout).to receive(:gets)
+        .and_return('add "Pauls Boutique" "Beastie Boys"','play "Ride the Lightning"',
+                    'add "Licensed to Ill" "Beastie Boys"', 'quit')
+      
+      session = Session.new(stdout)
+      expect(session.artists.length).to eq(1)
+    end
+
+    it 'should only store one record when a song is added twice' do
+      allow(stdout).to receive(:gets)
+        .and_return('add "Licensed to Ill" "Beastie Boys"','play "Ride the Lightning"',
+                    'add "Licensed to Ill" "Beastie Boys"', 'quit')
+      
+      session = Session.new(stdout)
+      expect(session.albums.length).to eq(1)
+      expect(session.artists.length).to eq(1)
+    end
   end
 end
