@@ -9,24 +9,39 @@ RSpec.describe Session do
   context 'new session' do
     it 'should start with an empty catalog' do
       allow(stdout).to receive(:gets) { 'quit' }
-      
-      # stdout.write('quit\n')
-      stdout.rewind
-      session = Session.new
+
+      session = Session.new(stdout)
       expect(session.albums.length).to eq(0)
       expect(session.artists.length).to eq(0)
     end
   end
 
-  context'add a song' do
+  context 'add a song' do
     it 'should add a song' do
       allow(stdout).to receive(:gets).and_return('add "Ride the Lightning" "Metallica"','quit')
       
-      # stdout.write('quit\n')
-      stdout.rewind
       session = Session.new(stdout)
       expect(session.albums.length).to eq(1)
       expect(session.artists.length).to eq(1)
     end
+  end
+
+  context 'playing songs changes state' do
+    it 'should store an unplayed song as unplayed' do
+      allow(stdout).to receive(:gets).and_return('add "Ride the Lightning" "Metallica"','quit')
+      
+      session = Session.new(stdout)
+      expect(session.albums.values.first.unplayed?).to eq(true)
+    end
+    
+    it 'should store an unplayed song as unplayed' do
+      allow(stdout).to receive(:gets)
+        .and_return('add "Ride the Lightning" "Metallica"','play "Ride the Lightning"', 'quit')
+      
+      session = Session.new(stdout)
+      album = session.albums.values.first
+      expect(album.unplayed?).to eq(false)
+    end
+
   end
 end

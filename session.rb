@@ -1,6 +1,6 @@
 class Session
   attr_reader :albums, :artists
-  def initialize(stdout=STDOUT)
+  def initialize(stdout=nil)
     @artists = {}
     @albums = {}
     @quit = false
@@ -24,7 +24,7 @@ class Session
   end
 
   def prompt
-    command = @stdout.gets.chomp
+    command = @stdout ? @stdout.gets.chomp : gets.chomp
     command_words = command.split
 
     puts
